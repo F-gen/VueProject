@@ -1,6 +1,6 @@
 <template>
   <section class="quote-list">
-    <div class="quote" v-for="(quote,i) in quotes.slice().reverse()" :key="i">
+    <div class="quote" v-for="(quote,i) in quotes" :key="i">
       <div class="quote-content" >
         {{quote.content}}---{{quote.character}}
       </div>
@@ -8,10 +8,9 @@
   </section>
 </template>
 
-<script>
-export default {
-  props:['quotes'],
-}
+<script setup>
+import {defineProps} from 'vue'
+defineProps(['quotes']);
 </script>
 
 <style scoped lang='scss'>

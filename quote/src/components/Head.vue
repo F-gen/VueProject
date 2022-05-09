@@ -5,10 +5,12 @@
 </template>
 
 <script>
-export default {
-  name: 'head',
-  props:['title']
-}
+export default {name: 'head',};
+</script>
+
+<script setup>
+import {defineProps} from 'vue'
+defineProps(['title']);
 </script>
 
 

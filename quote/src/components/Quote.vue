@@ -15,10 +15,9 @@
   </section>
 </template>
 
-<script>
-export default {
-  props:['quote']
-}
+<script setup>
+import {defineProps} from 'vue'
+defineProps(['quote']);
 </script>
 
 <style lang="scss" scoped>

@@ -1,45 +1,42 @@
 <template>
-<div class="app">
+
   <Header title="The Anime Quote" />
   <Quote  :quote="quote" />
   <div class="btn">
     <button @click="getquote()">Generate</button>
   </div>
-<QuoteList :quotes='quotes' />
-</div>
+  <QuoteList :quotes='quotes' />
+
 </template>
 
 <script>
+export default {name: 'App',};
+</script>
+<script setup>
+import { reactive,onMounted ,ref} from 'vue';
 import Header from './components/Head.vue'
 import Quote from './components/Quote.vue'
 import QuoteList from './components/quoteList.vue'
+let quote=reactive({
+  content:"",
+Anime:"",
+character:"",
+})
+let quotes=ref([])
+const getquote= async ()=>{
+     if(quote.content){
+       quotes.value.push(quote);
+    }
+  const data = await fetch('https://animechan.vercel.app/api/random').then(res=>res.json());
+  quote.content=data.quote
+  quote.Anime=data.anime
+  quote.character=data.character
 
-export default {
-  name: 'App',
-  components: { Header,Quote,QuoteList},
-  data() {
-    return {
-        quotes:[],
-        quote:{}
-    }
-  },
-  created(){
-    this.getquote()
-  },
-  methods:{
-    async getquote(){
-      if(this.quote.content){
-          this.quotes = [...this.quotes,this.quote]
-      }
-      const data = await fetch('https://animechan.vercel.app/api/random').then(res=>res.json());
-      this.quote = {
-        content:data.quote,
-        Anime:data.anime,
-        character:data.character
-      }
-    }
-  }
 }
+onMounted(()=>{
+  getquote()
+})
+
 </script>
 
 <style lang="scss">

@@ -24,9 +24,9 @@ character:"",
 })
 let quotes=ref([])
 const getquote= async ()=>{
-     if(quote.content){
-       quotes.value.push(quote);
-    }
+    //  if(quote.content){
+    //    quotes.value.push(quote);
+    // }
   const data = await fetch('https://animechan.vercel.app/api/random').then(res=>res.json());
   quote.content=data.quote
   quote.Anime=data.anime

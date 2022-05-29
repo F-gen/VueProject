@@ -5,6 +5,7 @@
         <!-- 左侧分类 -->
         <HomeCategory />
       </div>
+
     </div>
   </div>
 </template>

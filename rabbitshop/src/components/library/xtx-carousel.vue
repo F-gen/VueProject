@@ -27,10 +27,25 @@ export default {
     sliders: {
       type: Array,
       default: () => []
+    },
+    autoPlay: {
+      type: Boolean,
+      default: false
+    },
+    duration: {
+      type: Number,
+      default: 3000
     }
   },
+
   setup() {
+    // 控制图片索引
     const index = ref(0)
+    // 自动轮播逻辑
+    const time = null
+    const autoPlayFn = () => {
+      // 自动播放 每隔多久切换索引
+    }
     return { index }
   }
 }

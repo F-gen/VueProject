@@ -1,5 +1,5 @@
 <template>
-  <div class='xtx-carousel'>
+  <div class='xtx-carousel' @mouseenter="stop()" @mouseleave="start()">
     <!-- 图片容器ul -->
     <ul class="carousel-body">
       <!-- fade 加上 显示 图片 -->
@@ -9,18 +9,18 @@
         </RouterLink>
       </li>
     </ul>
-    <a href="javascript:;" class="carousel-btn prev"><i class="iconfont icon-angle-left"></i></a>
-    <a href="javascript:;" class="carousel-btn next"><i class="iconfont icon-angle-right"></i></a>
+    <a @click="toggle(-1)"  href="javascript:;" class="carousel-btn prev"><i class="iconfont icon-angle-left"></i></a>
+    <a @click="toggle(1)"  href="javascript:;" class="carousel-btn next"><i class="iconfont icon-angle-right"></i></a>
     <!-- 指示圆点 -->
     <div class="carousel-indicator">
       <!-- active 激活点 -->
-  <span v-for="(item,i) in sliders" :key="i" :class="{active:index===i}"></span>
+  <span v-for="(item,i) in sliders" :key="i" :class="{active:index===i}" @click="index=i"></span>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 export default {
   name: 'XtxCarousel',
   props: {
@@ -38,15 +38,55 @@ export default {
     }
   },
 
-  setup() {
+  setup(props) {
     // 控制图片索引
     const index = ref(0)
     // 自动轮播逻辑
-    const time = null
+    let timer = null
     const autoPlayFn = () => {
       // 自动播放 每隔多久切换索引
+      clearInterval(timer)
+      timer = setInterval(() => {
+        index.value++
+        if (index.value >= props.sliders.length) {
+          index.value = 0
+        }
+      }, props.duration)
     }
-    return { index }
+    // 1. 需要监听sliders 变化，有数据且autoplay 是true时，开启自动播放
+    watch(() => props.sliders, (newVal) => {
+      if (newVal.length && props.autoPlay) {
+        autoPlayFn()
+      }
+    }, { immediate: true })
+    // 2.鼠标进入暂停 离开自动播放(条件开启)
+    const stop = () => {
+      if (timer) clearInterval(timer)
+    }
+    const start = () => {
+      if (props.sliders.length && props.autoPlay) {
+        autoPlayFn()
+      }
+    }
+    // 3.点击 圆点切换  箭头切换
+    const toggle = (step) => {
+      const newindex = index.value + step
+      if (newindex > (props.sliders.length - 1)) {
+        index.value = 0
+      }
+      if (newindex < 0) {
+        index.value = props.sliders.length - 1
+      }
+      index.value = newindex
+    }
+    // 4.组件卸载 清楚定时器
+    onMounted(() => {
+      clearInterval(timer)
+    })
+    return {
+      index, stop, start, toggle
+
+    }
   }
 }
 </script>

@@ -7,16 +7,28 @@
          <!-- 轮播图 -->
          <HomeBanner />
       </div>
-
     </div>
+    <!-- 新鲜好物 -->
+<HomeNew />
+<!-- 人气推荐 -->
+<HomeHot />
+<!-- 使用transition组件 -->
+
   </div>
 </template>
 <script>
 import HomeCategory from './components/home-category'
 import HomeBanner from './components/home-banner'
+import HomeNew from './components/home-new'
+import HomeHot from './components/home-hot'
 export default {
   name: 'PageHome',
-  components: { HomeCategory, HomeBanner }
+  components: { HomeCategory, HomeBanner, HomeNew, HomeHot },
+  setup() {
+
+  }
 }
 </script>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+
+</style>

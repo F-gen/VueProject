@@ -11,10 +11,10 @@ export const useLazyData = (apiFn) => {
       if (isIntersecting) {
         stop()
         apiFn().then(date => {
-          result.value = date
+          result.value = date.result
         })
       }
     }
   )
-  return { target, result }
+  return { result, target }
 }

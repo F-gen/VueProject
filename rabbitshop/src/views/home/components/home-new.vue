@@ -35,7 +35,7 @@ export default {
     // findNew().then(data => {
     //   goods.value = data.result
     // })
-    // const target = ref(null)
+
     const { result, target } = useLazyData(findNew)
     return { goods: result, target }
   }

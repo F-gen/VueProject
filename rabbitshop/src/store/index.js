@@ -10,6 +10,7 @@ export default createStore({
     cart,
     category
   },
+  // npm i vuex-persistedstate
   plugins: [
     createPersistedstate({
       key: 'erabbit-client-pc-store',

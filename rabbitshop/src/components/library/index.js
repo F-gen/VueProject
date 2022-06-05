@@ -2,7 +2,7 @@
 // 这就是插件
 // vue2.0插件写法要素：导出一个对象，有install函数，默认传入了Vue构造函数，Vue基础之上扩展
 // vue3.0插件写法要素：导出一个对象，有install函数，默认传入了app应用实例，app基础之上扩展
-
+import defaultImg from '@/assets/images/200.png'
 import XtxSkeleton from './xtx-skeleton.vue'
 import XtxCarousel from './xtx-carousel.vue'
 import XtxMore from './xtx-more.vue'
@@ -13,5 +13,26 @@ export default {
     app.component(XtxSkeleton.name, XtxSkeleton)
     app.component(XtxCarousel.name, XtxCarousel)
     app.component(XtxMore.name, XtxMore)
+    // 定义指令
+    defineDirective(app)
   }
+}
+const defineDirective = (app) => {
+  // 图片懒加载指令
+  app.directive('lazyload', {
+    mounted(el, binding) {
+      const observer = new IntersectionObserver(([{ isIntersecting }]) => {
+        if (isIntersecting) {
+          observer.unobserve(el)
+          el.onerror = () => {
+            el.src = defaultImg
+          }
+          el.src = binding.value
+        }
+      }, {
+        threshold: 0.01
+      })
+      observer.observe(el)
+    }
+  })
 }

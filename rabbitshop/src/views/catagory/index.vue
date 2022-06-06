@@ -61,7 +61,9 @@ export default {
       if (item) cate = item
       return cate
     })
-    return { sliders, TopCategory }
+   
+   
+   return { sliders, TopCategory,subList }
   }
 }
 </script>

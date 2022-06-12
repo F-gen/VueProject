@@ -6,13 +6,32 @@
   </div>
 </template>
 <script>
-import { ref } from 'vue'
+// import { ref, watch } from 'vue'
+import { useVModel } from '@vueuse/core'
 export default {
   name: 'XtxCheckbox',
-  setup () {
-    const checked = ref(false)
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, { emit }) {
+    // const checked = ref(false)
+    // const changeChecked = () => {
+    //   checked.value = !checked.value
+    //   emit('update:modelValue', checked.value)
+    // }
+    // watch(() => props.modelValue, () => { checked.value = props.modelValue }, { immediate: true })
+    // return { checked, changeChecked }
+    // 法二 vueuse/core
+    const checked = useVModel(props, 'modelValue', emit)
     const changeChecked = () => {
-      checked.value = !checked.value
+      const newVal = !checked.value
+      // 通知父组件
+      checked.value = newVal
+      // 让组件支持change事件
+      emit('change', newVal)
     }
     return { checked, changeChecked }
   }

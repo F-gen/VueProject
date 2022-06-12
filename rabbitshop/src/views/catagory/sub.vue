@@ -5,6 +5,9 @@
     <SubBread />
     <!-- 筛选区 -->
     <SubFilter />
+    <!-- 测试复选框 -->
+    <XtxCheckbox> </XtxCheckbox>
+
   </div>
 </div>
 </template>

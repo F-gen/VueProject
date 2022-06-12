@@ -82,8 +82,9 @@ export default {
         }
       }
     }
-  }
-      .xtx-skeleton {
+     .xtx-skeleton {
       padding: 10px 0;
     }
+  }
+
 </style>

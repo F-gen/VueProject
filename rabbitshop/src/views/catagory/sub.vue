@@ -12,8 +12,8 @@
         <SubSort />
         <!-- 列表 -->
          <ul>
-          <li v-for="i in 20" :key="i" >
-            <GoodsItem :goods="{}" />
+          <li  v-for="item in goodsList" :key="item.id"  >
+            <GoodsItem :goods="item" />
           </li>
         </ul>
         <XtxInfiniteLoading :loading="loading" :finished="finished" @infinite="getData" />
@@ -67,7 +67,7 @@ export default {
 
     // 切换二级分类重新加载
     watch(() => route.params.id, (newVal) => {
-      if (newVal && route.path === ('/category/sub/' + newVal)) {
+      if (newVal && route.path === `/category/sub${newVal}`) {
         goodsList.value = []
         reqParams = {
           page: 1,

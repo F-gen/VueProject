@@ -9,7 +9,7 @@
       <!-- 结果区域 -->
       <div class="goods-list">
         <!-- 排序 -->
-        <SubSort />
+        <SubSort @sort-change="sortchange" />
         <!-- 列表 -->
          <ul>
           <li  v-for="item in goodsList" :key="item.id"  >
@@ -76,8 +76,16 @@ export default {
         finished.value = false
       }
     })
+    // 更改排序组件 筛选数据  重新请求
+    const sortchange = (sortparms) => {
+      finished.value = false
+      reqParams = { ...reqParams, ...sortparms }
+      reqParams.page = 1
+      goodsList.value = []
+    }
+    // 更改筛选组件 筛选数据  重新请求
 
-    return { loading, finished, goodsList, getData }
+    return { loading, finished, goodsList, getData, sortchange }
   }
 }
 </script>

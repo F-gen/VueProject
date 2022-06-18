@@ -4,7 +4,7 @@
     <!-- 面包屑 -->
     <SubBread />
     <!-- 筛选区 -->
-    <SubFilter />
+    <SubFilter  @sort-change="changeFilter" />
 
       <!-- 结果区域 -->
       <div class="goods-list">
@@ -84,8 +84,14 @@ export default {
       goodsList.value = []
     }
     // 更改筛选组件 筛选数据  重新请求
-
-    return { loading, finished, goodsList, getData, sortchange }
+    // 监听筛选区改变
+    const changeFilter = (filterParams) => {
+      reqParams = { ...reqParams, ...filterParams }
+      reqParams.page = 1
+      goodsList.value = []
+      finished.value = false
+    }
+    return { loading, finished, goodsList, getData, sortchange, changeFilter }
   }
 }
 </script>

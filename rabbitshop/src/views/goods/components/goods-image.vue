@@ -24,10 +24,10 @@ export default {
     }
   },
   setup (props) {
-    // const currIndex = ref(0)
+    const currIndex = ref(0)
     // const { currIndex, toggleImg } = useToggleImg()
     const { position, bgPosition, show, target } = usePreviewImg()
-    return { position, bgPosition, show, target }
+    return { position, bgPosition, show, target, currIndex }
   }
 }
 const usePreviewImg = () => {

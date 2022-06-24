@@ -60,6 +60,7 @@ const useGoods = () => {
   watch(() => route.params.id, (newVal) => {
     if (newVal && `/product/${newVal}` === route.path) {
       findGoods(route.params.id).then(data => {
+        console.log(data)
         // 让商品数据为null让后使用v-if的组件可以重新销毁和创建
         goods.value = null
         nextTick(() => {

@@ -28,7 +28,13 @@
 
 <script>
 export default {
-  name: 'GoodName'
+  name: 'GoodName',
+  props: {
+    goods: {
+      type: Object,
+      required: true
+    }
+  }
 }
 </script>
 

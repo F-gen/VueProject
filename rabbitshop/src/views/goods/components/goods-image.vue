@@ -24,6 +24,7 @@ export default {
     }
   },
   setup (props) {
+    // 当前预览图索引
     const currIndex = ref(0)
     // const { currIndex, toggleImg } = useToggleImg()
     const { position, bgPosition, show, target } = usePreviewImg()

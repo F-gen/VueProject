@@ -1,23 +1,37 @@
 <template>
   <div class="xtx-city" ref="target">
-    <div class="select" @click="toggleDialog" :class="{active}">
-      <span class="placeholder">请选择配送地址</span>
-      <span class="value"></span>
+    <div class="select" @click="toggleDialog" :class="{ active }">
+      <span v-if="!fullLocation" class="placeholder">请选择配送地址</span>
+      <span v-else class="value">{{ fullLocation }}</span>
       <i class="iconfont icon-angle-down"></i>
     </div>
     <div class="option" v-if="active">
-      <span class="ellipsis" v-for="i in 24" :key="i">北京市</span>
+      <div v-if="loading" class="loading"></div>
+      <template v-else>
+        <span @click="selectitem(item)" class="ellipsis" v-for="item in currList" :key="item.code">{{
+          item.name
+        }}</span>
+      </template>
     </div>
   </div>
 </template>
+
 <script>
-import { ref } from 'vue'
+import axios from 'axios'
+import { ref, computed, reactive } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 export default {
   name: 'XtxCity',
-  setup () {
+  props: {
+    fullLocation: {
+      type: String,
+      default: ''
+    }
+  },
+  setup (props, { emit }) {
     // 控制展开收起,默认收起
     const active = ref(false)
+
     const openDialog = () => {
       active.value = true
     }
@@ -28,14 +42,99 @@ export default {
     const toggleDialog = () => {
       if (active.value) closeDialog()
       else openDialog()
+      open()
     }
     // 点击其他位置隐藏
     const target = ref(null)
     onClickOutside(target, () => {
       closeDialog()
     })
-    return { active, toggleDialog, target }
+
+    // 获取城市数据,显示当前地方列表
+    // 2. 显示和隐藏函数（为什么是函数，做更多事情）
+    const loading = ref(false)
+    const cityData = ref([])
+    const open = () => {
+      active.value = true
+      loading.value = true
+      // 获取数据
+      getCityData().then(data => {
+        cityData.value = data
+        loading.value = false
+      })
+      for (const key in changeResutl) {
+        changeResutl[key] = ''
+      }
+    }
+
+    // 定义计算属性
+    const currList = computed(() => {
+      // 省份
+      let currList = cityData.value
+      // 城市
+      if (changeResutl.provinceCode) {
+        currList = currList.find(p => p.code === changeResutl.provinceCode).areaList
+      }
+      // 地区
+      if (changeResutl.cityCode) {
+        currList = currList.find(c => c.code === changeResutl.cityCode).areaList
+      }
+      return currList
+    })
+    // 定义选择的省市区数据
+    const changeResutl = reactive({
+      provinceCode: '',
+      provinceName: '',
+      cityCode: '',
+      cityName: '',
+      countCode: '',
+      countName: '',
+      fullLocation: ''
+    })
+    // 当点击 地区按钮
+    const selectitem = (item) => {
+      if (item.level === 0) {
+        // 省
+        changeResutl.provinceCode = item.code
+        changeResutl.provinceName = item.name
+      }
+      if (item.level === 1) {
+        // 市
+        changeResutl.cityCode = item.code
+        changeResutl.cityName = item.name
+      }
+      if (item.level === 2) {
+        // 区
+        changeResutl.countCode = item.code
+        changeResutl.countName = item.name
+        changeResutl.fullLocation = `${changeResutl.provinceName} ${changeResutl.cityName} ${changeResutl.countName}`
+        closeDialog()
+        emit('change', changeResutl)
+      }
+    }
+    return { active, toggleDialog, target, currList, loading, selectitem }
   }
+
+}
+// 获取城市数据
+// 1. 数据在哪里？https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/area.json
+// 2. 何时获取？打开城市列表的时候，做个内存中缓存
+// 3. 怎么使用数据？定义计算属性，根据点击的省份城市展示
+const getCityData = () => {
+  // 这个位置可能有异常操作，封装成promise
+  return new Promise((resolve, reject) => {
+    if (window.cityData) {
+      // 有缓存
+      resolve(window.cityData)
+    } else {
+      // 无缓存
+      const url = 'https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/area.json'
+      axios.get(url).then(res => {
+        window.cityData = res.data
+        resolve(window.cityData)
+      })
+    }
+  })
 }
 </script>
 <style scoped lang="less">
@@ -65,6 +164,11 @@ export default {
     }
   }
   .option {
+    .loading {
+      height: 290px;
+      width: 100%;
+      background: url(../../assets/images/loading.gif) no-repeat center;
+    }
     width: 542px;
     border: 1px solid #e4e4e4;
     position: absolute;

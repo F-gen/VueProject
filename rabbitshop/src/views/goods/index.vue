@@ -16,6 +16,8 @@
          </div>
         <div class="spec">
               <GoodsName :goods="goods"/>
+              <!-- 规格组件 -->
+                <GoodsSku  :goods="goods" />
         </div>
       </div>
       <!-- 商品推荐 -->
@@ -40,12 +42,13 @@ import GoodsRelevant from './components/goods-relevant'
 import GoodsImage from './components/goods-image'
 import GoodsSales from './components/goods-sales'
 import GoodsName from './components/goods-name'
+import GoodsSku from './components/goods-sku'
 import { nextTick, ref, watch } from 'vue'
 import { findGoods } from '@/api/product'
 import { useRoute } from 'vue-router'
 export default {
   name: 'XtxGoodsPage',
-  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName },
+  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
   setup () {
     const goods = useGoods()
 
@@ -60,7 +63,6 @@ const useGoods = () => {
   watch(() => route.params.id, (newVal) => {
     if (newVal && `/product/${newVal}` === route.path) {
       findGoods(route.params.id).then(data => {
-        console.log(data)
         // 让商品数据为null让后使用v-if的组件可以重新销毁和创建
         goods.value = null
         nextTick(() => {

@@ -18,7 +18,6 @@ export default {
     goods: {
       type: Object,
       default: () => ({ specs: [], skus: [] })
-
     }
 
   },

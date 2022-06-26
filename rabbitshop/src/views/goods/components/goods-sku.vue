@@ -4,14 +4,66 @@
       <dt>{{item.name}}</dt>
       <dd>
         <template v-for="val in item.values" :key="val.name">
-          <img :class="{selected:val.selected}" @click="clickSpecs(item,val)" v-if="val.picture" :src="val.picture" :title="val.name">
-          <span :class="{selected:val.selected}" @click="clickSpecs(item,val)" v-else>{{val.name}}</span>
+          <img :class="{selected:val.selected,disabled:val.disabled}" @click="clickSpecs(item,val)" v-if="val.picture" :src="val.picture" :title="val.name">
+          <span :class="{selected:val.selected,disabled:val.disabled}" @click="clickSpecs(item,val)" v-else>{{val.name}}</span>
         </template>
       </dd>
     </dl>
   </div>
 </template>
 <script>
+import getPowerSet from '@/vender/power-set'
+const spliter = '★'
+// 根据skus数据得到路径字典对象
+const getPathMap = (skus) => {
+  const pathMap = {}
+  skus.forEach(sku => {
+    // 1. 过滤出有库存有效的sku
+    if (sku.inventory) {
+      // 2. 得到sku属性值数组
+      const specs = sku.specs.map(spec => spec.valueName)
+      // 3. 得到sku属性值数组的子集
+      const powerSet = getPowerSet(specs)
+      // 4. 设置给路径字典对象
+      powerSet.forEach(set => {
+        const key = set.join(spliter)
+        if (pathMap[key]) {
+          // 已经有key往数组追加
+          pathMap[key].push(sku.id)
+        } else {
+          // 没有key设置一个数组
+          pathMap[key] = [sku.id]
+        }
+      })
+    }
+  })
+  return pathMap
+}
+// 得到当前选中规格集合
+const getSelectedArr = (specs) => {
+  const selectedArr = []
+  specs.forEach(spec => {
+    const selectedVal = spec.values.find(val => val.selected)
+    selectedArr.push(selectedVal ? selectedVal.name : undefined)
+  })
+  return selectedArr
+}
+// 更新按钮的禁用状态
+const updateDisabledStatus = (specs, pathMap) => {
+  specs.forEach((spec, i) => {
+    const selectedArr = getSelectedArr(specs)
+    spec.values.forEach(val => {
+      // 已经选中的按钮不用判断
+      if (val.name === selectedArr[i]) return false
+      // 未选中的替换对应的值
+      selectedArr[i] = val.name
+      // 过滤无效值得到key
+      const key = selectedArr.filter(v => v).join(spliter)
+      // 设置禁用状态
+      val.disabled = !pathMap[key]
+    })
+  })
+}
 export default {
   name: 'GoodsSku',
   props: {
@@ -22,16 +74,23 @@ export default {
 
   },
   setup (props) {
+    const pathMap = getPathMap(props.goods.skus)
+    // 初始化 更新按钮状态
+    updateDisabledStatus(props.goods.specs, pathMap)
     const clickSpecs = (item, val) => {
       // 1. 选中与取消选中逻辑
       // 若为选中的 点击取消
+      if (val.disabled) return false
       if (val.selected) {
         val.selected = false
       } else {
         item.values.forEach(bv => { bv.selected = false }) // 排他 选中
         val.selected = true
       }
+      // 点击按钮 更新状态
+      updateDisabledStatus(props.goods.specs, pathMap)
     }
+
     return { clickSpecs }
   }
 }

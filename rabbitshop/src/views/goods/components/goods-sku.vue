@@ -50,6 +50,7 @@ const getSelectedArr = (specs) => {
 }
 // 更新按钮的禁用状态
 const updateDisabledStatus = (specs, pathMap) => {
+  // console.log(specs, pathMap)
   specs.forEach((spec, i) => {
     const selectedArr = getSelectedArr(specs)
     spec.values.forEach(val => {
@@ -60,6 +61,7 @@ const updateDisabledStatus = (specs, pathMap) => {
       // 过滤无效值得到key
       const key = selectedArr.filter(v => v).join(spliter)
       // 设置禁用状态
+      // console.log(key, 'key', !pathMap[key])
       val.disabled = !pathMap[key]
     })
   })

@@ -89,7 +89,7 @@ export default {
         item.values.forEach(bv => { bv.selected = false }) // 排他 选中
         val.selected = true
       }
-      // 点击按钮 更新状态
+      // 点击按钮 更新 状态
       updateDisabledStatus(props.goods.specs, pathMap)
     }
 

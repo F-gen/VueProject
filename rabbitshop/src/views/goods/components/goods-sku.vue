@@ -48,7 +48,7 @@ const getSelectedArr = (specs) => {
   })
   return selectedArr
 }
-// 更新按钮的禁用状态
+// 更新按钮 禁用状态
 const updateDisabledStatus = (specs, pathMap) => {
   // console.log(specs, pathMap)
   specs.forEach((spec, i) => {
@@ -72,12 +72,16 @@ export default {
     goods: {
       type: Object,
       default: () => ({ specs: [], skus: [] })
+    },
+    skuId: {
+      type: String,
+      default: ''
     }
 
   },
   setup (props) {
     const pathMap = getPathMap(props.goods.skus)
-    // 初始化 更新按钮状态
+    // 初始化 更新 按钮状态
     updateDisabledStatus(props.goods.specs, pathMap)
     const clickSpecs = (item, val) => {
       // 1. 选中与取消选中逻辑

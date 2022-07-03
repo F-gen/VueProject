@@ -24,9 +24,11 @@ const getPathMap = (skus) => {
       const specs = sku.specs.map(spec => spec.valueName)
       // 3. 得到sku属性值数组的子集
       const powerSet = getPowerSet(specs)
+      console.log(powerSet)
       // 4. 设置给路径字典对象
       powerSet.forEach(set => {
         const key = set.join(spliter)
+        console.log(key, spliter, 'key')
         if (pathMap[key]) {
           // 已经有key往数组追加
           pathMap[key].push(sku.id)
@@ -66,6 +68,18 @@ const updateDisabledStatus = (specs, pathMap) => {
     })
   })
 }
+// 初始化选中状态
+const initSelectedStatus = (goods, skuId) => {
+  const sku = goods.skus.find(sku => sku.id === skuId)
+  if (sku) {
+    goods.specs.forEach((spec, i) => {
+      const value = sku.specs[i].valueName
+      spec.values.forEach(val => {
+        val.selected = val.name === value
+      })
+    })
+  }
+}
 export default {
   name: 'GoodsSku',
   props: {
@@ -79,8 +93,10 @@ export default {
     }
 
   },
-  setup (props) {
+  setup (props, { emit }) {
     const pathMap = getPathMap(props.goods.skus)
+    // 根据传入的skuId默认选中规格按钮
+    initSelectedStatus(props.goods, props.skuId)
     // 初始化 更新 按钮状态
     updateDisabledStatus(props.goods.specs, pathMap)
     const clickSpecs = (item, val) => {
@@ -95,6 +111,22 @@ export default {
       }
       // 点击按钮 更新 状态
       updateDisabledStatus(props.goods.specs, pathMap)
+      // 触发change事件将sku数据传递出去
+      const selectedArr = getSelectedArr(props.goods.specs).filter(v => v)
+      if (selectedArr.length === props.goods.specs.length) {
+        const skuIds = pathMap[selectedArr.join(spliter)]
+        const sku = props.goods.skus.find(sku => sku.id === skuIds[0])
+        // 传递
+        emit('change', {
+          skuId: sku.id,
+          price: sku.price,
+          oldPrice: sku.oldPrice,
+          inventory: sku.inventory,
+          specsText: sku.specs.reduce((p, n) => `${p} ${n.name}：${n.valueName}`, '').replace(' ', '')
+        })
+      } else {
+        emit('change', {})
+      }
     }
 
     return { clickSpecs }

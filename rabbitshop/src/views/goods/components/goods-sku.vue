@@ -24,11 +24,11 @@ const getPathMap = (skus) => {
       const specs = sku.specs.map(spec => spec.valueName)
       // 3. 得到sku属性值数组的子集
       const powerSet = getPowerSet(specs)
-      console.log(powerSet)
+      // console.log(powerSet)
       // 4. 设置给路径字典对象
       powerSet.forEach(set => {
         const key = set.join(spliter)
-        console.log(key, spliter, 'key')
+        // console.log(key, spliter, 'key')
         if (pathMap[key]) {
           // 已经有key往数组追加
           pathMap[key].push(sku.id)

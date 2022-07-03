@@ -18,10 +18,12 @@
               <GoodsName :goods="goods"/>
               <!-- 规格组件 -->
                 <GoodsSku  :goods="goods" skuId="1771008" @change="changeSku" />
+                <XtxNumbox label="数量" v-model="num" :max="goods.inventory"/>
+                <XtxButton type="primary" style="margin-top:20px;">加入购物车</XtxButton>
         </div>
       </div>
       <!-- 商品推荐 -->
-      <GoodsRelevant />
+      <GoodsRelevant :goodsId="goods.id" />
       <!-- 商品详情 -->
       <div class="goods-footer">
         <div class="goods-article">
@@ -58,7 +60,9 @@ export default {
         goods.value.inventory = sku.inventory
       }
     }
-    return { goods, changeSku }
+    const num = ref(1)
+
+    return { goods, changeSku, num }
   }
 }
 // 获取商品详情

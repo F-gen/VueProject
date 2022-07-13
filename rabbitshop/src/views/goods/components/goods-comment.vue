@@ -1,6 +1,6 @@
 <template>
   <div class="goods-comment">
-    <!-- 头部 -->
+    <!-- 评价头部 -->
     <div class="head" v-if="commentInfo">
       <div class="data">
         <p><span>{{ commentInfo.salesCount }}</span><span>人购买</span></p>
@@ -10,54 +10,140 @@
         <div class="dt">大家都在说：</div>
         <div class="dd">
           <a v-for="(item, i) in commentInfo.tags" :key="item.title" href="javascript:;"
-            :class="{ active: currTagIndex === i }" @click="changeTag(i)">
-            {{ item.title }}（{{ item.tagCount }}）
-          </a>
+            :class="{ active: currentTagIndex === i }" @click="changeTag(i)">{{ item.title }}（{{ item.tagCount }}）</a>
         </div>
       </div>
     </div>
     <div class="sort" v-if="commentInfo">
       <span>排序：</span>
-      <a href="javascript:;" class="active">默认</a>
-      <a href="javascript:;">最新</a>
-      <a href="javascript:;">最热</a>
+      <a @click="changeSort(null)" :class="{ active: reqParams.sortField === null }" href="javascript:;">默认</a>
+      <a @click="changeSort('createTime')" :class="{ active: reqParams.sortField === 'createTime' }"
+        href="javascript:;">最新</a>
+      <a @click="changeSort('praiseCount')" :class="{ active: reqParams.sortField === 'praiseCount' }"
+        href="javascript:;">最热</a>
     </div>
-    <div class="list"></div>
+    <!-- 评价列表 -->
+    <div class="list" v-if="commentList">
+      <div class="item" v-for="item in commentList" :key="item.id">
+        <div class="user">
+          <img :src="item.member.avatar" alt="">
+          <span>{{ formatNickname(item.member.nickname) }}</span>
+        </div>
+        <div class="body">
+          <div class="score">
+            <i v-for="i in item.score" :key="i + 's'" class="iconfont icon-wjx01"></i>
+            <i v-for="i in 5 - item.score" :key="i + 'k'" class="iconfont icon-wjx02"></i>
+            <span class="attr">{{ formatSpecs(item.orderInfo.specs) }}</span>
+          </div>
+          <div class="text">{{ item.content }}</div>
+          <!-- 评论图片组件 -->
+          <GoodsCommentImage v-if="item.pictures.length" :pictures="item.pictures" />
+          <div class="time">
+            <span>{{ item.createTime }}</span>
+            <span class="zan"><i class="iconfont icon-dianzan"></i>{{ item.praiseCount }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 分页组件 -->
+    <XtxPagination v-if="total" @current-change="changePagerFn" :page-size="reqParams.pageSize"
+      :current-page="reqParams.page" />
   </div>
 </template>
-
 <script>
-import { findCommentInfoByGoods } from '@/api/goods'
-import { ref, inject } from 'vue'
-const getCommentInfo = (goods) => {
-  const commentInfo = ref(null)
-  findCommentInfoByGoods(goods.id).then(data => {
-    // type 的目的是将来点击可以区分点的是不是标签
-    data.result.tags.unshift({ type: 'img', title: '有图', tagCount: data.result.hasPictureCount })
-    data.result.tags.unshift({ type: 'all', title: '全部评价', tagCount: data.result.evaluateCount })
-    commentInfo.value = data.result
-  })
-  return commentInfo
-}
+import { inject, reactive, ref, watch } from 'vue'
+import { findGoodsCommentInfo, findGoodsCommentList } from '@/api/product'
+import GoodsCommentImage from './goods-comment-image'
 export default {
   name: 'GoodsComment',
-
+  components: { GoodsCommentImage },
   setup() {
+    // 获取评价信息
+    const commentInfo = ref(null)
     const goods = inject('goods')
-    const commentInfo = getCommentInfo(goods)
-    const currTagIndex = ref(0)
+    findGoodsCommentInfo(goods.value.id).then((data) => {
+      data.result.tags.unshift({
+        title: '有图',
+        tagCount: data.result.hasPictureCount,
+        type: 'img'
+      })
+      data.result.tags.unshift({
+        title: '全部评价',
+        tagCount: data.result.evaluateCount,
+        type: 'all'
+      })
+      // 设置数据之前，tags数组前追加 有图tag  全部评价tag
+      commentInfo.value = data.result
+    })
+
+    // 激活tag
+    const currentTagIndex = ref(0)
     const changeTag = (i) => {
-      currTagIndex.value = i
+      currentTagIndex.value = i
+      // 点击tag的时候修改筛选条件
+      const tag = commentInfo.value.tags[i]
+      // 情况1：全部评价
+      // 情况2：有图
+      // 情况3：正常tag
+      if (tag.type === 'all') {
+        reqParams.hasPicture = null
+        reqParams.tag = null
+      } else if (tag.type === 'img') {
+        reqParams.hasPicture = true
+        reqParams.tag = null
+      } else {
+        reqParams.hasPicture = null
+        reqParams.tag = tag.title
+      }
+      // 重置页码1
+      reqParams.page = 1
     }
-    return {
-      commentInfo,
-      currTagIndex,
-      changeTag
+
+    // 点击排序
+    const changeSort = (sortField) => {
+      reqParams.sortField = sortField
+      // 重置页码1
+      reqParams.page = 1
     }
+
+    // 准备筛选条件数据
+    const reqParams = reactive({
+      page: 1,
+      pageSize: 10,
+      hasPicture: null,
+      tag: null,
+      // 排序方式：praiseCount 热度  createTime 最新
+      sortField: null
+    })
+
+    // 初始化需要发请求，筛选条件发生改变发请求
+    const commentList = ref([])
+    const total = ref(0)
+    watch(reqParams, () => {
+      findGoodsCommentList(goods.value.id, reqParams).then(data => {
+        commentList.value = data.result.items
+        total.value = data.result.counts
+      })
+    }, { immediate: true })
+
+    // 定义转换数据的函数（对应vue2.0的过滤器）
+    const formatSpecs = (specs) => {
+      return specs.reduce((p, c) => `${p} ${c.name}：${c.nameValue}`, '').trim()
+    }
+    const formatNickname = (nickname) => {
+      return nickname.substr(0, 1) + '****' + nickname.substr(-1)
+    }
+
+    // 实现分页切换
+    const changePagerFn = (newPage) => {
+      reqParams.page = newPage
+    }
+
+    return { commentInfo, currentTagIndex, changeTag, reqParams, commentList, changeSort, formatSpecs, formatNickname, total, changePagerFn }
   }
 }
 </script>
-<style lang="less" scoped>
+<style scoped lang="less">
 .goods-comment {
   .head {
     display: flex;
@@ -153,5 +239,61 @@ export default {
       }
     }
   }
+
+  .list {
+    padding: 0 20px;
+
+    .item {
+      display: flex;
+      padding: 25px 10px;
+      border-bottom: 1px solid #f5f5f5;
+
+      .user {
+        width: 160px;
+
+        img {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          overflow: hidden;
+        }
+
+        span {
+          padding-left: 10px;
+          color: #666;
+        }
+      }
+
+      .body {
+        flex: 1;
+
+        .score {
+          line-height: 40px;
+
+          .iconfont {
+            color: #ff9240;
+            padding-right: 3px;
+          }
+
+          .attr {
+            padding-left: 10px;
+            color: #666;
+          }
+        }
+      }
+
+      .text {
+        color: #666;
+        line-height: 24px;
+      }
+
+      .time {
+        color: #999;
+          display: flex;
+          justify-content: space-between;
+          margin-top: 5px;
+        }
+        }
+        }
 }
 </style>

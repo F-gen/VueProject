@@ -1,22 +1,23 @@
 <template>
   <div class="page-home">
+
     <div class="home-entry">
       <div class="container">
         <!-- 左侧分类 -->
         <HomeCategory />
-         <!-- 轮播图 -->
-         <HomeBanner />
+        <!-- 轮播图 -->
+        <HomeBanner />
       </div>
     </div>
-     <!-- 新鲜好物 -->
-     <HomeNew />
-     <!-- 人气推荐 -->
-     <HomeHot />
-     <!-- 热门品牌 -->
-     <HomeBrand />
-  <!-- 商品区域 -->
-   <HomeProduct />
-      <!-- 最新专题 -->
+    <!-- 新鲜好物 -->
+    <HomeNew />
+    <!-- 人气推荐 -->
+    <HomeHot />
+    <!-- 热门品牌 -->
+    <HomeBrand />
+    <!-- 商品区域 -->
+    <HomeProduct />
+    <!-- 最新专题 -->
     <HomeSpecial />
   </div>
 </template>

@@ -13,7 +13,8 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    "space-before-function-paren": 0
+    "space-before-function-paren": 0,
+    "no-trailing-spaces": 1,//一行结束后面不要有空格
     // "no-alert": 0,//禁止使用alert confirm prompt
 // "no-array-constructor": 2,//禁止使用数组构造器
 // "no-bitwise": 0,//禁止使用按位运算符
@@ -96,7 +97,7 @@ module.exports = {
 // "no-sparse-arrays": 2,//禁止稀疏数组， [1,,2]
 // "no-sync": 0,//nodejs 禁止同步方法
 // "no-ternary": 0,//禁止使用三目运算符
-// "no-trailing-spaces": 1,//一行结束后面不要有空格
+
 // "no-this-before-super": 0,//在调用super()之前不能使用this或super
 // "no-throw-literal": 2,//禁止抛出字面量错误 throw "error";
 // "no-undef": 1,//不能有未定义的变量

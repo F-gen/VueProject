@@ -3,20 +3,18 @@
     <!-- 属性 -->
     <ul class="attrs">
       <li v-for="item in goods.details.properties" :key="item.value">
-        <span class="dt">{{ item.name }}</span>
-        <span class="dd">{{ item.value }}</span>
+        <span class="dt">{{item.name}}</span>
+        <span class="dd">{{item.value}}</span>
       </li>
     </ul>
     <!-- 图片 -->
     <img v-for="item in goods.details.pictures" :key="item" :src="item" alt="">
   </div>
 </template>
-
 <script>
 import { inject } from 'vue'
-
 export default {
-  name: 'goods_detail',
+  name: 'GoodsDetial',
   setup() {
     const goods = inject('goods')
     return { goods }

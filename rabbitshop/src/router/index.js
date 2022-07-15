@@ -2,8 +2,8 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 
 const Layout = () => import('@/views/Layout')
 const Home = () => import('@/views/home')
-const TopCategory = () => import('@/views/catagory')
-const SubCategory = () => import('@/views/catagory/sub')
+const TopCategory = () => import('@/views/category')
+const SubCategory = () => import('@/views/category/sub')
 const Goods = () => import('@/views/goods/index')
 const Login = () => import('@/views/login/index')
 const routes = [
